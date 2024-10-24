@@ -164,15 +164,16 @@
     autojump
     ripgrep
     fzf
-    lazygit
     vim
     micro
     wget
     libgcc
     gcc14
     nodejs_20
-    pulseaudio
+    lazydocker
+    lazygit
 
+    jq
     hurl
     httpie
     httpie-desktop
@@ -180,6 +181,7 @@
 
     xfce.thunar
     slack
+    pulseaudio
 
     grim # screenshot functionality
     slurp # screenshot functionality
