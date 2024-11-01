@@ -1,15 +1,24 @@
 { config, pkgs, lib, ... }:
 let
+  tex = (pkgs.texlive.combine {
+    inherit (pkgs.texlive) scheme-full
+      dvisvgm dvipng # for preview and export as html
+      wrapfig amsmath ulem hyperref capt-of;
+      #(setq org-latex-compiler "lualatex")
+      #(setq org-preview-latex-default-process 'dvisvgm)
+  });
   home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-24.05.tar.gz";
 in
 {
   imports = [
     (import "${home-manager}/nixos")
   ];
-
   home-manager.users.michi = {
+
+    services.kdeconnect.enable = true;
     programs.zsh = {
 	    enable = true;
+	    # completionInit = "";
 	    enableCompletion = true;
 	    
 	    syntaxHighlighting.enable = true;
@@ -30,7 +39,12 @@ in
 			ll = "ls -lah --color=auto";
 			edit = "sudo -e";
 			update = "sudo nixos-rebuild switch";
-			
+			docker-compose="docker compose";
+			cdn="cd ~/Documents/diamir/rudi-backend";
+			cdu="cd ~/Documents/diamir/uniqa-rudi";
+			cdp="cd ~/Documents/diamir/playbooks";
+			cdk="cd ~/Documents/diamir/klz-backend/";
+			cdd="cd ~/Documents/diamir/";
 	    };
 
 	    profileExtra = ''
@@ -56,6 +70,8 @@ in
 	      zstyle ':completion:*' use-cache on
 	      zstyle ':completion:*' menu select
 	      WORDCHARS=''${WORDCHARS//\/[&.;]}                                 # Don't consider certain characters part of the word
+	      bindkey "^[[1;5C" forward-word # zsh ctrl right and left 
+	      bindkey "^[[1;5D" backward-word
 	    '';
 
 		autocd = true;
@@ -67,6 +83,66 @@ in
     #wayland.windowManager.sway = {
     #  enable = true;
     #};
+    programs.autojump = {
+    	enable = true;
+    	enableZshIntegration = true;
+    };
+    programs.git = {
+        enable = true;
+        userEmail = "michael.plattner@diamir.io";
+        userName = "Michael Plattner";
+        # signing = {
+        #     signByDefault = true;
+        # 	key = "~/.ssh/id_ed25519.pub";
+        # };
+        delta = {
+        	enable = true;
+        	options = {
+        		
+        	navigate = true;
+        	light = false;
+
+        	};
+        };
+        extraConfig = {
+           init.defaultBranch = "main";
+
+           
+            commit.gpgsign = true;
+        	gpg.format = "ssh";
+        	user.signingkey = "~/.ssh/id_ed25519.pub";
+           commit = {
+           	verbose = true;
+           };
+           core = {
+               autocrlf = "input";
+               hooksPath = "/home/michi/.githooks";
+           };
+           branch = {
+           	sort = "-committerdate";
+           };
+           push = {
+           	default = "current";
+           	autoSetupRemote = true;
+           };
+           column = {
+           	ui = "auto";
+           };
+           merge = {
+           	conflictstyle = "zdiff3";
+           };
+           rerere = {
+           	enabled = true;
+           	autoUpdate = true;
+           };
+        };
+        ignores = [
+           "*~"
+           "*.swp"
+           "*result*"
+           "node_modules"
+        ];
+    };
     programs.starship = {
       enable = true;
       settings = {
@@ -173,8 +249,19 @@ in
 		  scan_timeout = 10;
       };
     };
+
     /* The home.stateVersion option does not have a default and must be set */
     home.stateVersion = "24.05";
     /* Here goes the rest of your home-manager config, e.g. home.packages = [ pkgs.foo ]; */
+    
+	home.packages = with pkgs; [
+	  tex
+	];
   };
+  
+   networking.firewall = rec {
+   	
+ 		allowedTCPPortRanges = [ { from = 1714; to = 1764; } ];
+ 		allowedUDPPortRanges = allowedTCPPortRanges;
+   };
 }

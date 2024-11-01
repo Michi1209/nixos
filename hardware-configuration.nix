@@ -77,8 +77,10 @@ in
     platform = "ipu6ep";
   };
   services.fprintd.enable = true;
-  services.fprintd.tod.enable = true;
-  services.fprintd.tod.driver = pkgs.libfprint-2-tod1-vfs0090;
+  # disable tod for fingerprint to work
+  #services.fprintd.tod.enable = true;
+  #services.fprintd.tod.driver = pkgs.libfprint-2-tod1-elan;
+  #services.fprintd.tod.driver = pkgs.libfprint-2-tod1-goodix;
 
   hardware.enableRedistributableFirmware = true;
 
